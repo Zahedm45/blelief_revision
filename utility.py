@@ -44,4 +44,4 @@ def find_prop(self, propo, index):
 
     arr = {result, start_index, end_index}
 
-    return arr
+    return result

@@ -8,10 +8,10 @@ class CNF:
     def convert_to_cnf(self, proposition):
         for i in range(len(proposition) - 1):
             if proposition[i] == "=" and proposition[i + 1] == ">":
-                val1 = self.find_proposition(proposition, i)
-
-                val2 = self.remove_implication(val1[0])
-                print(propo)
+                old_val = self.find_proposition(proposition, i)
+                new_val = self.remove_implication(old_val)
+                proposition = self.replace_proposition(old_val, new_val, proposition)
+                print("after: ",proposition)
                 #break
 
     def remove_implication(self, proposition):
@@ -28,11 +28,14 @@ class CNF:
         return find_prop(self, propos, index)
 
 
-    def replace_proposition(self, propos, val):
-        propos[]
+    def replace_proposition(self, old_val, new_val, proposition):
+        return proposition.replace(old_val, new_val, 1)
 
 
 cnf = CNF()
 str = "(pVq)=>(!m)^(b)=>(h)"
+
+
+
 print("before: " + str)
 cnf.convert_to_cnf(str)
