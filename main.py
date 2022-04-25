@@ -21,6 +21,7 @@ class CNF:
             #         new_val = self.biconditional(old_val)
             #         print(new_val)
 
+#test
 
     def implication(self, proposition):
         proposition = proposition.replace("=", "V", 1)
