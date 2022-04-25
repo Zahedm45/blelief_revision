@@ -18,8 +18,8 @@ class Belief_Base(self):
         self.new_beliefs = [] #==> not sure it's useful
 
     def create_new_belief(self,belief): # maybe we can mix this function with the next one, but it might be useful later to have them separate
-
-        self.new_beliefs.append((belief.formula,belief.order))
+        if belief.order<=1 and belief.order>=0 :
+            self.new_beliefs.append((to_cnf(belief.formula),belief.order))
 
     def add_new_beliefs(self):
         
