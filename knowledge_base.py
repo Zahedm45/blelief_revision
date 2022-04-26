@@ -2,31 +2,7 @@ import itertools
 
 from sympy.logic.boolalg import to_cnf, And, Or, Equivalent
 from entailment import do_entail
-
-
-# class Belief:
-#     def __init__(self, formula, order):
-#         self.formula = formula
-#         self.order = order
-
-#     def __repr__(self):
-#         return f"formula: {self.formula}, order: {self.order}"
-
-
-def _is_tautology(formula):
-    """
-    Returns True if is a tautology.
-    We use an empty knowledge base to confront the formula to itself
-    """
-    return do_entail([], formula)
-
-
-def _is_contradiction(formula):
-    """
-    Check if formula is not a contradiction with empty knowledge base
-    Example of a contradiciton: p & (~p)
-    """
-    return do_entail([], ~formula)
+from utils import _is_contradiction, _is_tautology
 
 
 def dissociate(op, args):
@@ -70,9 +46,9 @@ class KnowledgeBase:
                     # Befiefs of higher order shouldn't be impacted
                     continue
 
-                d = self.degree(formula >> belief_formula)
+                d = self.max_order_before_entail(formula >> belief_formula)
                 if (
-                    do_entail([], Equivalent(formula, belief_formula))
+                    _is_tautology(Equivalent(formula, belief_formula))
                     or belief_order <= order < d
                 ):
                     self.add_belief(belief_formula, order)
@@ -85,12 +61,12 @@ class KnowledgeBase:
 
         for belief_formula, belief_order in self.knowledge_base.items():
             if belief_order > order:
-                dx = self.degree(formula)
 
                 formula_or_belief = associate(Or, [formula, belief_formula])
-                dxory = self.degree(formula_or_belief)
 
-                if dx == dxory:
+                if self.max_order_before_entail(
+                    formula
+                ) == self.max_order_before_entail(formula_or_belief):
                     self.add_belief(belief_formula, order)
 
     def agm_revise(self, formula, order):
@@ -102,7 +78,7 @@ class KnowledgeBase:
         if _is_tautology(formula):
             order = 1
 
-        elif order <= self.degree(formula):
+        elif order <= self.max_order_before_entail(formula):
             self.contract(formula, order)
         else:
             self.contract(~formula, 0)
@@ -111,29 +87,34 @@ class KnowledgeBase:
     def add_belief(self, formula, order):
         self.knowledge_base[formula] = order
 
-    def degree(self, formula):
+    def max_order_before_entail(self, formula):
         """
-        Find maximum order j such that taking all beliefs in base
-        with order >= j results in a belief set that entails formula.
+        Return the maximum order that for which all the beliefs with higher
+        order entail this formula.
         """
 
         formula = to_cnf(formula)
-        if do_entail([], formula):
-            # Tautologies have degree = 1
+        if _is_tautology(formula):
             return 1
 
         base = []
-
-        for order, group in itertools.groupby(
-            self.knowledge_base.items(), lambda item: item[1]
+        # This loops through grouped belief. They are grouped by order
+        # and sorted by order desc
+        for order, group in sorted(
+            itertools.groupby(self.knowledge_base.items(), lambda item: item[1]),
+            key=lambda x: -x[0],
         ):
-            # Get formulas from beliefs
             base += [formula for formula, _ in group]
             if do_entail(base, formula):
                 return order
+
         return 0
 
     def __repr__(self):
+        """
+        This method override the native one in order to make it readable in the HCI
+        """
+
         if len(self.knowledge_base.items()) == 0:
             return "Your knowledge base is empty"
 
