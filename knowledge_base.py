@@ -1,17 +1,16 @@
-import math
-import numpy as np
+import itertools
 
 from sympy.logic.boolalg import to_cnf, And, Or, Equivalent
 from entailment import do_entail
 
 
-class Belief:
-    def __init__(self, formula, order):
-        self.formula = formula
-        self.order = order
+# class Belief:
+#     def __init__(self, formula, order):
+#         self.formula = formula
+#         self.order = order
 
-    def __repr__(self):
-        return f"formula: {self.formula}, order: {self.order}"
+#     def __repr__(self):
+#         return f"formula: {self.formula}, order: {self.order}"
 
 
 def _is_tautology(formula):
@@ -58,10 +57,6 @@ class KnowledgeBase:
     def __init__(self):
         self.knowledge_base = {}  # {formula: order}
 
-    def create_new_belief(self, belief):
-        if 0 <= belief.order <= 1:
-            self.knowledge_base[to_cnf(belief.formula)] = belief.order
-
     def expand(self, formula, order):
         formula = to_cnf(formula)
 
@@ -70,32 +65,33 @@ class KnowledgeBase:
         if _is_tautology(formula):
             order = 1
         else:
-            for belief in self.knowledge_base:
-                if belief.order > order:
+            for belief_formula, belief_order in self.knowledge_base.items():
+                if belief_order > order:
                     # Befiefs of higher order shouldn't be impacted
                     continue
 
-                d = self.degree(formula >> belief.formula)
+                d = self.degree(formula >> belief_formula)
                 if (
-                    do_entail([], Equivalent(formula, belief.formula))
-                    or belief.order <= order < d
+                    do_entail([], Equivalent(formula, belief_formula))
+                    or belief_order <= order < d
                 ):
-                    self.add_belief(belief, order)
+                    self.add_belief(belief_formula, order)
                 else:
-                    self.add_belief(belief, d)
+                    self.add_belief(belief_formula, d)
+        self.add_belief(formula, order)
 
     def contract(self, formula, order):
         formula = to_cnf(formula)
 
-        for belief in self.knowledge_base:
-            if belief.order > order:
+        for belief_formula, belief_order in self.knowledge_base.items():
+            if belief_order > order:
                 dx = self.degree(formula)
 
-                formula_or_belief = associate(Or, [x, y])
+                formula_or_belief = associate(Or, [formula, belief_formula])
                 dxory = self.degree(formula_or_belief)
 
                 if dx == dxory:
-                    self.add_belief(belief, order)
+                    self.add_belief(belief_formula, order)
 
     def agm_revise(self, formula, order):
         formula = to_cnf(formula)
@@ -105,6 +101,7 @@ class KnowledgeBase:
 
         if _is_tautology(formula):
             order = 1
+
         elif order <= self.degree(formula):
             self.contract(formula, order)
         else:
@@ -126,9 +123,12 @@ class KnowledgeBase:
             return 1
 
         base = []
-        for order, group in [sorted(self.knowledge_base.items(), key=lambda x: x[1])]:
+
+        for order, group in itertools.groupby(
+            self.knowledge_base.items(), lambda item: item[1]
+        ):
             # Get formulas from beliefs
-            base += [b.formula for b in group]
+            base += [formula for formula, _ in group]
             if do_entail(base, formula):
                 return order
         return 0
@@ -136,4 +136,10 @@ class KnowledgeBase:
     def __repr__(self):
         if len(self.knowledge_base.items()) == 0:
             return "Your knowledge base is empty"
-        return "\n".join([str(belief) for belief in self.knowledge_base.items()])
+
+        return "\n".join(
+            [
+                f"formula: {formula}, order: {order}"
+                for formula, order in self.knowledge_base.items()
+            ]
+        )

@@ -31,11 +31,11 @@ def human_input(knowledge_base):
             knowledge_base.agm_revise(formula, float(order))
         except SympifyError:
             print("####  Invalid formula  ####")
-        except ValueError:
-            print("####  The value for the order has to be between 0 and 1  ####")
+        # except ValueError:
+        #     print("####  The value for the order has to be between 0 and 1  ####")
 
     elif action == "e":
-        knowledge_base.beliefs = {}
+        knowledge_base.knowledge_base = {}
         print("####  Knowledge Base emptied  ####")
 
     elif action == "p":

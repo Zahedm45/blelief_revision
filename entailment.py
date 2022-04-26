@@ -14,9 +14,13 @@ def removeall(to_remove, to_remove_from):
 
 def do_entail(knowledge_base, formula_to_test):
     # #1 Convert KB ∧ ~phi to cnf
-    clauses = [junct(clause, "&") for clause in knowledge_base] + junct(
-        to_cnf(~formula_to_test), "&"
-    )
+    formula_to_test = to_cnf(formula_to_test)
+    clauses = []
+
+    for clause in knowledge_base:
+        clauses += junct(clause, "&")
+
+    clauses += junct(to_cnf(~formula_to_test), "&")
 
     new = set()
 
@@ -31,7 +35,7 @@ def do_entail(knowledge_base, formula_to_test):
             resolvents = resolve(ci, cj)
             if False in resolvents:
                 return True
-            new.union_update(set(resolvents))
+            new.union(set(resolvents))
 
         if new.issubset(set(clauses)):
             return False
