@@ -23,3 +23,8 @@ def entails(KB,phi):
                 return True     # The goal of the entailment is to find a contradiction since we are reasoning by absurd.
             
             result.union(L)     # Check with thomas what type the function resolve gives
+
+    if result.issubset(set(clauses)):    #same will depend on the type of resolve outcome
+        return False            #if after the for loop the result (which is the contracted version of the KB+phi) is still
+                                # a subset from the KB+phi, then there is no contradiction so the KB doesn't entrail phi. 
+                                
