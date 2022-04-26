@@ -27,7 +27,4 @@ class Belief_Base(self):
             self.beliefs[b] = o
 
         sorted(self.beliefs.items(),key=lambda x:-x[1])
-        self.new_beliefs = []
-    
-
-    
+        self.new_beliefs = [] 
