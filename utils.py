@@ -1,5 +1,6 @@
 from entailment import do_entail
 
+
 def _is_tautology(formula):
     """
     Returns True if is a tautology. Tautology have order of 1

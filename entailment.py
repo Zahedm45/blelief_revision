@@ -1,15 +1,8 @@
+"""
+Here are defined the entailment method. It uses various 
+utils functions that enable us to parse the fomula"""
+
 from sympy.logic.boolalg import Or, And, to_cnf
-
-
-def junct(s, operator):
-    if s == operator:
-        return s.args
-    else:
-        return [s]
-
-
-def removeall(to_remove, to_remove_from):
-    return [elmt for elmt in to_remove_from if elmt != to_remove]
 
 
 def do_entail(knowledge_base, formula_to_test):
@@ -45,48 +38,13 @@ def do_entail(knowledge_base, formula_to_test):
                 clauses.append(c)
 
 
-def disjuncts(clause):
-    return dissociate(Or, [clause])
-
-
-def conjuncts(clause):
-    return dissociate(And, [clause])
-
-
-def associate(op, args):
-    args = dissociate(op, args)
-    if len(args) == 0:
-        return op.identity
-    elif len(args) == 1:
-        return args[0]
-    else:
-        return op(*args)
-
-
-def dissociate(op, args):
-    result = []
-
-    def collect(subargs):
-        for arg in subargs:
-            # e.g: (a|c) & (b|c) is an instance of And. Then its args are (a|c, b|c).
-            # We then recursively do this until we reach args that are not instances
-            # of the op.
-            if isinstance(arg, op):
-                collect(arg.args)
-            else:
-                result.append(arg)
-
-    collect(args)
-    return result
-
-
 def resolve(ci, cj):
     """
     Returns the set of all possible clauses obtained by resolving the inputs
     """
 
     clauses = []
-
+    # Lets first dissociate the clauses
     ci_disjuncts = disjuncts(ci)
     cj_disjuncts = disjuncts(cj)
 
@@ -95,9 +53,60 @@ def resolve(ci, cj):
             if ci_disjunct == ~cj_disjunct or ~ci_disjunct == cj_disjunct:
                 new = list(
                     set(
-                        removeall(ci_disjunct, ci_disjuncts)
-                        + removeall(cj_disjunct, cj_disjuncts)
+                        remove_from_array(ci_disjunct, ci_disjuncts)
+                        + remove_from_array(cj_disjunct, cj_disjuncts)
                     )
                 )
                 clauses.append(associate(Or, new))
     return clauses
+
+
+def remove_from_array(to_remove, to_remove_from):
+    """
+    Returns an array without 1 chosen element
+    """
+    return [elmt for elmt in to_remove_from if elmt != to_remove]
+
+
+def disjuncts(cls):
+    return dissociate(Or, [cls])
+
+
+def conjuncts(cls):
+    return dissociate(And, [cls])
+
+
+def associate(op, args):
+    """
+    This method separates all of the args from an instance of logical
+    formulae and associates them back together with the specified
+    operator.
+    """
+    args = dissociate(op, args)
+    if len(args) == 0:
+        # True for 'And', False for 'Or'.
+        return op.identity
+    elif len(args) == 1:
+        return args[0]
+    else:
+        return op(*args)
+
+
+def dissociate(op, args):
+    """
+    This method separates the instances:
+    e.g: (a|c) & (b|c) is an instance of And. Then its args are (a|c, b|c).
+    We then recursively do this until we reach args that are not instances
+    of the op.
+    """
+    result = []
+
+    def collect(subargs):
+        for arg in subargs:
+            if isinstance(arg, op):
+                collect(arg.args)
+            else:
+                result.append(arg)
+
+    collect(args)
+    return result
