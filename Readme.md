@@ -4,7 +4,8 @@ It is a python implementation of the AGM Belief Revision model
 
 Authors: 
     Thomas HEBRARD - s212816
-    Victor GUÉRIN - s212
+    Victor GUÉRIN - s212818
+    Mohammed Zahed - s186517
 
 
 Installation: 
