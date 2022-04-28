@@ -1,3 +1,9 @@
+"""
+This is the Human Control Interface (HCI). A way to play with the knwoledge base engine.
+The prompts will ask quesions to the user, and will wait for an answer in the terminal.
+"""
+
+
 import argparse
 
 from sympy import to_cnf, SympifyError

@@ -1,32 +1,8 @@
 import itertools
 
 from sympy.logic.boolalg import to_cnf, And, Or, Equivalent
-from entailment import do_entail
+from entailment import do_entail, associate
 from utils import _is_contradiction, _is_tautology
-
-
-def dissociate(op, args):
-    result = []
-
-    def collect(subargs):
-        for arg in subargs:
-            if isinstance(arg, op):
-                collect(arg.args)
-            else:
-                result.append(arg)
-
-    collect(args)
-    return result
-
-
-def associate(op, args):
-    args = dissociate(op, args)
-    if len(args) == 0:
-        return op.identity
-    elif len(args) == 1:
-        return args[0]
-    else:
-        return op(*args)
 
 
 class KnowledgeBase:
@@ -34,6 +10,10 @@ class KnowledgeBase:
         self.knowledge_base = {}  # {formula: order}
 
     def expand(self, formula, order):
+        """
+        KB + φ; φ is added to KB giving a new belief set KB'.
+        (KB being the knowledge base)
+        """
         formula = to_cnf(formula)
 
         if _is_contradiction(formula):
@@ -57,6 +37,10 @@ class KnowledgeBase:
         self.add_belief(formula, order)
 
     def contract(self, formula, order):
+        """
+        KB ÷ φ; φ is removed from KB giving a new belief set KB'.
+        (KB being the knowledge base)
+        """
         formula = to_cnf(formula)
 
         for belief_formula, belief_order in self.knowledge_base.items():
@@ -70,6 +54,13 @@ class KnowledgeBase:
                     self.add_belief(belief_formula, order)
 
     def agm_revise(self, formula, order):
+        """
+        KB * φ; φ is added and other things are removed, so that the
+        resulting new belief set KB' is consistent.
+        Here we use the Levi identity:
+            KB * φ := (KB ÷ ~φ) + φ
+        which says that a revision is an expansion of a contraction.
+        """
         formula = to_cnf(formula)
 
         if _is_contradiction(formula):
@@ -112,7 +103,7 @@ class KnowledgeBase:
 
     def __repr__(self):
         """
-        This method override the native one in order to make it readable in the HCI
+        This method overrides the native one in order to make it readable in the HCI
         """
 
         if len(self.knowledge_base.items()) == 0:
