@@ -80,7 +80,7 @@ class KnowledgeBase:
 
     def max_order_before_entail(self, formula):
         """
-        Return the maximum order that for which all the beliefs with higher
+        Return the maximum order for which all the beliefs with higher
         order entail this formula.
         """
 
