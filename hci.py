@@ -51,7 +51,7 @@ def human_input(knowledge_base):
         manual()
 
     else:
-        print("####  Sorry, the command was not recognized. Type 'h' for help.  ####")
+        print("####  Sorry, the command was not recognized. Type 'm' to see all available actions ####")
 
     human_input(knowledge_base)
 
