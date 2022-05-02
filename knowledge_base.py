@@ -22,7 +22,7 @@ class KnowledgeBase:
             order = 1
         else:
             for belief_formula, belief_order in self.knowledge_base.items():
-                if belief_order > order:
+                if belief_order < order:
                     # Befiefs of higher order shouldn't be impacted
                     continue
 
@@ -52,6 +52,7 @@ class KnowledgeBase:
                     formula
                 ) == self.max_order_before_entail(formula_or_belief):
                     self.add_belief(belief_formula, order)
+        self.add_belief(formula, order)
 
     def agm_revise(self, formula, order):
         """
@@ -74,6 +75,8 @@ class KnowledgeBase:
         else:
             self.contract(~formula, 0)
             self.expand(formula, order)
+        
+        #self.remove_useless()
 
     def add_belief(self, formula, order):
         self.knowledge_base[formula] = order
@@ -101,6 +104,11 @@ class KnowledgeBase:
 
         return 0
 
+    def remove_useless(self):
+        for i in self.knowledge_base.items():
+            if i[1]==0:
+                del self.knowledge_base[i[0]]
+
     def __repr__(self):
         """
         This method overrides the native one in order to make it readable in the HCI
@@ -112,6 +120,8 @@ class KnowledgeBase:
         return "\n".join(
             [
                 f"formula: {formula}, order: {order}"
-                for formula, order in self.knowledge_base.items()
+                for formula, order in sorted(
+                    self.knowledge_base.items(), key=lambda x: -x[1]
+                )
             ]
         )

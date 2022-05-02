@@ -1,6 +1,7 @@
 This project is an engine that allows beliefs management.
 
-It is a python implementation of the AGM Belief Revision model
+It is a python implementation of the AGM Belief Revision model.
+This code base was based on the algorithms in Applications of Belief Revision by Mary-Anne Williams, 1996, and adapted from a MIT license: aima-python.
 
 Authors: 
 ```

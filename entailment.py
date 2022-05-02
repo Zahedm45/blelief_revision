@@ -79,7 +79,7 @@ def conjuncts(cls):
 def associate(op, args):
     """
     This method separates all of the args from an instance of logical
-    formulae and associates them back together with the specified
+    formula and associates them back together with the specified
     operator.
     """
     args = dissociate(op, args)
