@@ -83,7 +83,7 @@ class KnowledgeBase:
 
     def max_order_before_entail(self, formula):
         """
-        Return the maximum order that for which all the beliefs with higher
+        Return the maximum order for which all the beliefs with higher
         order entail this formula.
         """
 
@@ -120,6 +120,8 @@ class KnowledgeBase:
         return "\n".join(
             [
                 f"formula: {formula}, order: {order}"
-                for formula, order in self.knowledge_base.items()
+                for formula, order in sorted(
+                    self.knowledge_base.items(), key=lambda x: -x[1]
+                )
             ]
         )
