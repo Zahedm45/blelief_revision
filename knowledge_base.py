@@ -22,7 +22,7 @@ class KnowledgeBase:
             order = 1
         else:
             for belief_formula, belief_order in self.knowledge_base.items():
-                if belief_order > order:
+                if belief_order < order:
                     # Befiefs of higher order shouldn't be impacted
                     continue
 
@@ -52,6 +52,7 @@ class KnowledgeBase:
                     formula
                 ) == self.max_order_before_entail(formula_or_belief):
                     self.add_belief(belief_formula, order)
+        self.add_belief(formula, order)
 
     def agm_revise(self, formula, order):
         """
