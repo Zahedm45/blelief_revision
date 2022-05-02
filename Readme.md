@@ -8,6 +8,7 @@ Authors:
     Thomas HEBRARD - s212816
     Victor GUÉRIN - s212817
     Mohammed Zahed - s186517
+    Viktor Anzhelev Tsanev - s184453
 ```
 
 Installation: 
