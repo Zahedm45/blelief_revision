@@ -75,6 +75,8 @@ class KnowledgeBase:
         else:
             self.contract(~formula, 0)
             self.expand(formula, order)
+        
+        #self.remove_useless()
 
     def add_belief(self, formula, order):
         self.knowledge_base[formula] = order
@@ -101,6 +103,11 @@ class KnowledgeBase:
                 return order
 
         return 0
+
+    def remove_useless(self):
+        for i in self.knowledge_base.items():
+            if i[1]==0:
+                del self.knowledge_base[i[0]]
 
     def __repr__(self):
         """
